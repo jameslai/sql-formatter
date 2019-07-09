@@ -3,7 +3,7 @@
   "version": "2.3.3",
   "description": "Formats whitespaces in a SQL query to make it more readable",
   "license": "MIT",
-  "main": "lib/sqlFormatter.js",
+  "main": "dist/sql-formatter.min.js",
   "keywords": [
     "sql",
     "formatter",
