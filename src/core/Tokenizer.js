@@ -87,13 +87,14 @@ export default class Tokenizer {
     // 5. national character quoted string using N'' or N\' to escape
     // 6. double dollar sign quoted string for multi-line strings, no need to escape anything other than $$
     createStringPattern(stringTypes) {
+        // prettier-ignore
         const patterns = {
             "``": "((`[^`]*($|`))+)",
             "[]": "((\\[[^\\]]*($|\\]))(\\][^\\]]*($|\\]))*)",
             '""': '(("[^"\\\\]*(?:\\\\.[^"\\\\]*)*("|$))+)',
             "''": "(('[^'\\\\]*(?:\\\\.[^'\\\\]*)*('|$))+)",
             "N''": "((N'[^N'\\\\]*(?:\\\\.[^N'\\\\]*)*('|$))+)",
-            $$$$: "((\\$\\$(?:\\$[^\\$]+|[^\\$])*(\\$\\$|$))+)"
+            "$$$$": "((\\$\\$(?:\\$[^\\$]+|[^\\$])*(\\$\\$|$))+)"
         };
 
         return stringTypes.map(t => patterns[t]).join("|");
