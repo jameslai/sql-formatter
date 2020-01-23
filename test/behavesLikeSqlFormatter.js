@@ -8,29 +8,31 @@ export default function behavesLikeSqlFormatter(language) {
     it("uses given indent config for indention", function() {
         const result = sqlFormatter.format(
             "SELECT count(*),Column1 FROM Table1;",
-            {language, indent: "    "}
+            { language, indent: "    " }
         );
 
         expect(result).toBe(
             "SELECT\n" +
-            "    count(*),\n" +
-            "    Column1\n" +
-            "FROM\n" +
-            "    Table1;"
+                "    count(*),\n" +
+                "    Column1\n" +
+                "FROM\n" +
+                "    Table1;"
         );
     });
 
     function format(query) {
-        return sqlFormatter.format(query, {language});
+        return sqlFormatter.format(query, { language });
     }
 
     it("formats simple SET SCHEMA queries", function() {
-        const result = format("SET SCHEMA tetrisdb; SET CURRENT SCHEMA bingodb;");
+        const result = format(
+            "SET SCHEMA tetrisdb; SET CURRENT SCHEMA bingodb;"
+        );
         expect(result).toBe(
             "SET SCHEMA\n" +
-            "  tetrisdb;\n" +
-            "SET CURRENT SCHEMA\n" +
-            "  bingodb;"
+                "  tetrisdb;\n" +
+                "SET CURRENT SCHEMA\n" +
+                "  bingodb;"
         );
     });
 
@@ -38,10 +40,10 @@ export default function behavesLikeSqlFormatter(language) {
         const result = format("SELECT count(*),Column1 FROM Table1;");
         expect(result).toBe(
             "SELECT\n" +
-            "  count(*),\n" +
-            "  Column1\n" +
-            "FROM\n" +
-            "  Table1;"
+                "  count(*),\n" +
+                "  Column1\n" +
+                "FROM\n" +
+                "  Table1;"
         );
     });
 
@@ -51,100 +53,79 @@ export default function behavesLikeSqlFormatter(language) {
         );
         expect(result).toBe(
             "SELECT\n" +
-            "  DISTINCT name,\n" +
-            "  ROUND(age / 7) field1,\n" +
-            "  18 + 20 AS field2,\n" +
-            "  'some string'\n" +
-            "FROM\n" +
-            "  foo;"
+                "  DISTINCT name,\n" +
+                "  ROUND(age / 7) field1,\n" +
+                "  18 + 20 AS field2,\n" +
+                "  'some string'\n" +
+                "FROM\n" +
+                "  foo;"
         );
     });
 
     it("formats SELECT with complex WHERE", function() {
         const result = sqlFormatter.format(
             "SELECT * FROM foo WHERE Column1 = 'testing'" +
-            "AND ( (Column2 = Column3 OR Column4 >= NOW()) );"
+                "AND ( (Column2 = Column3 OR Column4 >= NOW()) );"
         );
         expect(result).toBe(
             "SELECT\n" +
-            "  *\n" +
-            "FROM\n" +
-            "  foo\n" +
-            "WHERE\n" +
-            "  Column1 = 'testing'\n" +
-            "  AND (\n" +
-            "    (\n" +
-            "      Column2 = Column3\n" +
-            "      OR Column4 >= NOW()\n" +
-            "    )\n" +
-            "  );"
+                "  *\n" +
+                "FROM\n" +
+                "  foo\n" +
+                "WHERE\n" +
+                "  Column1 = 'testing'\n" +
+                "  AND (\n" +
+                "    (\n" +
+                "      Column2 = Column3\n" +
+                "      OR Column4 >= NOW()\n" +
+                "    )\n" +
+                "  );"
         );
     });
 
     it("formats SELECT with toplevel reserved words", function() {
         const result = format(
             "SELECT * FROM foo WHERE name = 'John' GROUP BY some_column " +
-            "HAVING column > 10 ORDER BY other_column LIMIT 5;"
+                "HAVING column > 10 ORDER BY other_column LIMIT 5;"
         );
         expect(result).toBe(
             "SELECT\n" +
-            "  *\n" +
-            "FROM\n" +
-            "  foo\n" +
-            "WHERE\n" +
-            "  name = 'John'\n" +
-            "GROUP BY\n" +
-            "  some_column\n" +
-            "HAVING\n" +
-            "  column > 10\n" +
-            "ORDER BY\n" +
-            "  other_column\n" +
-            "LIMIT\n" +
-            "  5;"
+                "  *\n" +
+                "FROM\n" +
+                "  foo\n" +
+                "WHERE\n" +
+                "  name = 'John'\n" +
+                "GROUP BY\n" +
+                "  some_column\n" +
+                "HAVING\n" +
+                "  column > 10\n" +
+                "ORDER BY\n" +
+                "  other_column\n" +
+                "LIMIT\n" +
+                "  5;"
         );
     });
 
     it("formats LIMIT with two comma-separated values on single line", function() {
-        const result = format(
-            "LIMIT 5, 10;"
-        );
-        expect(result).toBe(
-            "LIMIT\n" +
-            "  5, 10;"
-        );
+        const result = format("LIMIT 5, 10;");
+        expect(result).toBe("LIMIT\n" + "  5, 10;");
     });
 
     it("formats LIMIT of single value followed by another SELECT using commas", function() {
-        const result = format(
-            "LIMIT 5; SELECT foo, bar;"
-        );
+        const result = format("LIMIT 5; SELECT foo, bar;");
         expect(result).toBe(
-            "LIMIT\n" +
-            "  5;\n" +
-            "SELECT\n" +
-            "  foo,\n" +
-            "  bar;"
+            "LIMIT\n" + "  5;\n" + "SELECT\n" + "  foo,\n" + "  bar;"
         );
     });
 
     it("formats LIMIT of single value and OFFSET", function() {
-        const result = format(
-            "LIMIT 5 OFFSET 8;"
-        );
-        expect(result).toBe(
-            "LIMIT\n" +
-            "  5 OFFSET 8;"
-        );
+        const result = format("LIMIT 5 OFFSET 8;");
+        expect(result).toBe("LIMIT\n" + "  5 OFFSET 8;");
     });
 
     it("recognizes LIMIT in lowercase", function() {
-        const result = format(
-            "limit 5, 10;"
-        );
-        expect(result).toBe(
-            "limit\n" +
-            "  5, 10;"
-        );
+        const result = format("limit 5, 10;");
+        expect(result).toBe("limit\n" + "  5, 10;");
     });
 
     it("preserves case of keywords", function() {
@@ -153,13 +134,13 @@ export default function behavesLikeSqlFormatter(language) {
         );
         expect(result).toBe(
             "select\n" +
-            "  distinct *\n" +
-            "frOM\n" +
-            "  foo\n" +
-            "  left join bar\n" +
-            "WHERe\n" +
-            "  a > 1\n" +
-            "  and b = 3"
+                "  distinct *\n" +
+                "frOM\n" +
+                "  foo\n" +
+                "  left join bar\n" +
+                "WHERe\n" +
+                "  a > 1\n" +
+                "  and b = 3"
         );
     });
 
@@ -169,59 +150,59 @@ export default function behavesLikeSqlFormatter(language) {
         );
         expect(result).toBe(
             "SELECT\n" +
-            "  *,\n" +
-            "  SUM(*) AS sum\n" +
-            "FROM\n" +
-            "  (\n" +
-            "    SELECT\n" +
-            "      *\n" +
-            "    FROM\n" +
-            "      Posts\n" +
-            "    LIMIT\n" +
-            "      30\n" +
-            "  )\n" +
-            "WHERE\n" +
-            "  a > b"
+                "  *,\n" +
+                "  SUM(*) AS sum\n" +
+                "FROM\n" +
+                "  (\n" +
+                "    SELECT\n" +
+                "      *\n" +
+                "    FROM\n" +
+                "      Posts\n" +
+                "    LIMIT\n" +
+                "      30\n" +
+                "  )\n" +
+                "WHERE\n" +
+                "  a > b"
         );
     });
 
     it("formats SELECT query with INNER JOIN", function() {
         const result = format(
             "SELECT customer_id.from, COUNT(order_id) AS total FROM customers " +
-            "INNER JOIN orders ON customers.customer_id = orders.customer_id;"
+                "INNER JOIN orders ON customers.customer_id = orders.customer_id;"
         );
         expect(result).toBe(
             "SELECT\n" +
-            "  customer_id.from,\n" +
-            "  COUNT(order_id) AS total\n" +
-            "FROM\n" +
-            "  customers\n" +
-            "  INNER JOIN orders ON customers.customer_id = orders.customer_id;"
+                "  customer_id.from,\n" +
+                "  COUNT(order_id) AS total\n" +
+                "FROM\n" +
+                "  customers\n" +
+                "  INNER JOIN orders ON customers.customer_id = orders.customer_id;"
         );
     });
 
     it("formats SELECT query with different comments", function() {
         const result = format(
             "SELECT\n" +
-            "/*\n" +
-            " * This is a block comment\n" +
-            " */\n" +
-            "* FROM\n" +
-            "-- This is another comment\n" +
-            "MyTable # One final comment\n" +
-            "WHERE 1 = 2;"
+                "/*\n" +
+                " * This is a block comment\n" +
+                " */\n" +
+                "* FROM\n" +
+                "-- This is another comment\n" +
+                "MyTable # One final comment\n" +
+                "WHERE 1 = 2;"
         );
         expect(result).toBe(
             "SELECT\n" +
-            "  /*\n" +
-            "   * This is a block comment\n" +
-            "   */\n" +
-            "  *\n" +
-            "FROM\n" +
-            "  -- This is another comment\n" +
-            "  MyTable # One final comment\n" +
-            "WHERE\n" +
-            "  1 = 2;"
+                "  /*\n" +
+                "   * This is a block comment\n" +
+                "   */\n" +
+                "  *\n" +
+                "FROM\n" +
+                "  -- This is another comment\n" +
+                "  MyTable # One final comment\n" +
+                "WHERE\n" +
+                "  1 = 2;"
         );
     });
 
@@ -231,51 +212,46 @@ export default function behavesLikeSqlFormatter(language) {
         );
         expect(result).toBe(
             "INSERT INTO\n" +
-            "  Customers (ID, MoneyBalance, Address, City)\n" +
-            "VALUES\n" +
-            "  (12, -123.4, 'Skagen 2111', 'Stv');"
+                "  Customers (ID, MoneyBalance, Address, City)\n" +
+                "VALUES\n" +
+                "  (12, -123.4, 'Skagen 2111', 'Stv');"
         );
     });
 
     it("keeps short parenthized list with nested parenthesis on single line", function() {
-        const result = format(
-            "SELECT (a + b * (c - NOW()));"
-        );
-        expect(result).toBe(
-            "SELECT\n" +
-            "  (a + b * (c - NOW()));"
-        );
+        const result = format("SELECT (a + b * (c - NOW()));");
+        expect(result).toBe("SELECT\n" + "  (a + b * (c - NOW()));");
     });
 
     it("breaks long parenthized lists to multiple lines", function() {
         const result = format(
             "INSERT INTO some_table (id_product, id_shop, id_currency, id_country, id_registration) (" +
-            "SELECT IF(dq.id_discounter_shopping = 2, dq.value, dq.value / 100)," +
-            "IF (dq.id_discounter_shopping = 2, 'amount', 'percentage') FROM foo);"
+                "SELECT IF(dq.id_discounter_shopping = 2, dq.value, dq.value / 100)," +
+                "IF (dq.id_discounter_shopping = 2, 'amount', 'percentage') FROM foo);"
         );
         expect(result).toBe(
             "INSERT INTO\n" +
-            "  some_table (\n" +
-            "    id_product,\n" +
-            "    id_shop,\n" +
-            "    id_currency,\n" +
-            "    id_country,\n" +
-            "    id_registration\n" +
-            "  ) (\n" +
-            "    SELECT\n" +
-            "      IF(\n" +
-            "        dq.id_discounter_shopping = 2,\n" +
-            "        dq.value,\n" +
-            "        dq.value / 100\n" +
-            "      ),\n" +
-            "      IF (\n" +
-            "        dq.id_discounter_shopping = 2,\n" +
-            "        'amount',\n" +
-            "        'percentage'\n" +
-            "      )\n" +
-            "    FROM\n" +
-            "      foo\n" +
-            "  );"
+                "  some_table (\n" +
+                "    id_product,\n" +
+                "    id_shop,\n" +
+                "    id_currency,\n" +
+                "    id_country,\n" +
+                "    id_registration\n" +
+                "  ) (\n" +
+                "    SELECT\n" +
+                "      IF(\n" +
+                "        dq.id_discounter_shopping = 2,\n" +
+                "        dq.value,\n" +
+                "        dq.value / 100\n" +
+                "      ),\n" +
+                "      IF (\n" +
+                "        dq.id_discounter_shopping = 2,\n" +
+                "        'amount',\n" +
+                "        'percentage'\n" +
+                "      )\n" +
+                "    FROM\n" +
+                "      foo\n" +
+                "  );"
         );
     });
 
@@ -285,12 +261,12 @@ export default function behavesLikeSqlFormatter(language) {
         );
         expect(result).toBe(
             "UPDATE\n" +
-            "  Customers\n" +
-            "SET\n" +
-            "  ContactName = 'Alfred Schmidt',\n" +
-            "  City = 'Hamburg'\n" +
-            "WHERE\n" +
-            "  CustomerName = 'Alfreds Futterkiste';"
+                "  Customers\n" +
+                "SET\n" +
+                "  ContactName = 'Alfred Schmidt',\n" +
+                "  City = 'Hamburg'\n" +
+                "WHERE\n" +
+                "  CustomerName = 'Alfreds Futterkiste';"
         );
     });
 
@@ -300,37 +276,26 @@ export default function behavesLikeSqlFormatter(language) {
         );
         expect(result).toBe(
             "DELETE FROM\n" +
-            "  Customers\n" +
-            "WHERE\n" +
-            "  CustomerName = 'Alfred'\n" +
-            "  AND Phone = 5002132;"
+                "  Customers\n" +
+                "WHERE\n" +
+                "  CustomerName = 'Alfred'\n" +
+                "  AND Phone = 5002132;"
         );
     });
 
     it("formats simple DROP query", function() {
-        const result = format(
-            "DROP TABLE IF EXISTS admin_role;"
-        );
-        expect(result).toBe(
-            "DROP TABLE IF EXISTS admin_role;"
-        );
+        const result = format("DROP TABLE IF EXISTS admin_role;");
+        expect(result).toBe("DROP TABLE IF EXISTS admin_role;");
     });
 
     it("formats uncomplete query", function() {
         const result = format("SELECT count(");
-        expect(result).toBe(
-            "SELECT\n" +
-            "  count("
-        );
+        expect(result).toBe("SELECT\n" + "  count(");
     });
 
     it("formats query that ends with open comment", function() {
         const result = format("SELECT count(*)\n/*Comment");
-        expect(result).toBe(
-            "SELECT\n" +
-            "  count(*)\n" +
-            "  /*Comment"
-        );
+        expect(result).toBe("SELECT\n" + "  count(*)\n" + "  /*Comment");
     });
 
     it("formats UPDATE query with AS part", function() {
@@ -339,40 +304,44 @@ export default function behavesLikeSqlFormatter(language) {
         );
         expect(result).toBe(
             "UPDATE\n" +
-            "  customers\n" +
-            "SET\n" +
-            "  totalorders = ordersummary.total\n" +
-            "FROM\n" +
-            "  (\n" +
-            "    SELECT\n" +
-            "      *\n" +
-            "    FROM\n" +
-            "      bank\n" +
-            "  ) AS ordersummary"
+                "  customers\n" +
+                "SET\n" +
+                "  totalorders = ordersummary.total\n" +
+                "FROM\n" +
+                "  (\n" +
+                "    SELECT\n" +
+                "      *\n" +
+                "    FROM\n" +
+                "      bank\n" +
+                "  ) AS ordersummary"
         );
     });
 
     it("formats top-level and newline multi-word reserved words with inconsistent spacing", function() {
-        const result = format("SELECT * FROM foo LEFT \t OUTER  \n JOIN bar ORDER \n BY blah");
+        const result = format(
+            "SELECT * FROM foo LEFT \t OUTER  \n JOIN bar ORDER \n BY blah"
+        );
         expect(result).toBe(
             "SELECT\n" +
-            "  *\n" +
-            "FROM\n" +
-            "  foo\n" +
-            "  LEFT OUTER JOIN bar\n" +
-            "ORDER BY\n" +
-            "  blah"
+                "  *\n" +
+                "FROM\n" +
+                "  foo\n" +
+                "  LEFT OUTER JOIN bar\n" +
+                "ORDER BY\n" +
+                "  blah"
         );
     });
 
     it("formats long double parenthized queries to multiple lines", function() {
-        const result = format("((foo = '0123456789-0123456789-0123456789-0123456789'))");
+        const result = format(
+            "((foo = '0123456789-0123456789-0123456789-0123456789'))"
+        );
         expect(result).toBe(
             "(\n" +
-            "  (\n" +
-            "    foo = '0123456789-0123456789-0123456789-0123456789'\n" +
-            "  )\n" +
-            ")"
+                "  (\n" +
+                "    foo = '0123456789-0123456789-0123456789-0123456789'\n" +
+                "  )\n" +
+                ")"
         );
     });
 
@@ -416,34 +385,23 @@ export default function behavesLikeSqlFormatter(language) {
     });
 
     it("formats AND/OR operators", function() {
-        expect(format("foo BETWEEN bar AND baz")).toBe("foo BETWEEN bar\nAND baz");
+        expect(format("foo BETWEEN bar AND baz")).toBe(
+            "foo BETWEEN bar\nAND baz"
+        );
         expect(format("foo AND bar")).toBe("foo\nAND bar");
         expect(format("foo OR bar")).toBe("foo\nOR bar");
     });
 
     it("recognizes strings", function() {
-        expect(format("\"foo JOIN bar\"")).toBe("\"foo JOIN bar\"");
+        expect(format('"foo JOIN bar"')).toBe('"foo JOIN bar"');
         expect(format("'foo JOIN bar'")).toBe("'foo JOIN bar'");
         expect(format("`foo JOIN bar`")).toBe("`foo JOIN bar`");
     });
 
     it("recognizes escaped strings", function() {
-        expect(format("\"foo \\\" JOIN bar\"")).toBe("\"foo \\\" JOIN bar\"");
+        expect(format('"foo \\" JOIN bar"')).toBe('"foo \\" JOIN bar"');
         expect(format("'foo \\' JOIN bar'")).toBe("'foo \\' JOIN bar'");
         expect(format("`foo `` JOIN bar`")).toBe("`foo `` JOIN bar`");
-    });
-
-    it("formats postgres specific operators", function() {
-        expect(format("column::int")).toBe("column :: int");
-        expect(format("v->2")).toBe("v -> 2");
-        expect(format("v->>2")).toBe( "v ->> 2");
-        expect(format("foo ~~ 'hello'")).toBe("foo ~~ 'hello'");
-        expect(format("foo !~ 'hello'")).toBe("foo !~ 'hello'");
-        expect(format("foo ~* 'hello'")).toBe("foo ~* 'hello'");
-        expect(format("foo ~~* 'hello'")).toBe("foo ~~* 'hello'");
-        expect(format("foo !~~ 'hello'")).toBe("foo !~~ 'hello'");
-        expect(format("foo !~* 'hello'")).toBe("foo !~* 'hello'");
-        expect(format("foo !~~* 'hello'")).toBe("foo !~~* 'hello'");
     });
 
     it("keeps separation between multiple statements", function() {
@@ -451,18 +409,20 @@ export default function behavesLikeSqlFormatter(language) {
         expect(format("foo\n;bar;")).toBe("foo;\nbar;");
         expect(format("foo\n\n\n;bar;\n\n")).toBe("foo;\nbar;");
 
-        const result = format("SELECT count(*),Column1 FROM Table1;\nSELECT count(*),Column1 FROM Table2;");
+        const result = format(
+            "SELECT count(*),Column1 FROM Table1;\nSELECT count(*),Column1 FROM Table2;"
+        );
         expect(result).toBe(
             "SELECT\n" +
-            "  count(*),\n" +
-            "  Column1\n" +
-            "FROM\n" +
-            "  Table1;\n" + 
-            "SELECT\n" +
-            "  count(*),\n" +
-            "  Column1\n" +
-            "FROM\n" +
-            "  Table2;"
+                "  count(*),\n" +
+                "  Column1\n" +
+                "FROM\n" +
+                "  Table1;\n" +
+                "SELECT\n" +
+                "  count(*),\n" +
+                "  Column1\n" +
+                "FROM\n" +
+                "  Table2;"
         );
     });
 }
