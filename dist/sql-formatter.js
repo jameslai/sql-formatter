@@ -416,8 +416,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _classCallCheck(this, Tokenizer);
 
 	        this.WHITESPACE_REGEX = /^(\s+)/;
-	        this.NUMBER_REGEX = /^((-\s*)?[0-9]+(\.[0-9]+)?|0x[0-9a-fA-F]+|0b[01]+)\b/;
-	        this.OPERATOR_REGEX = /^(!=|<>|==|<=|>=|!<|!>|\|\||::|->>|->|~~\*|~~|!~~\*|!~~|~\*|!~\*|!~|.)/;
+	        this.NUMBER_REGEX = /^((-\s*)?[0-9]+(\.[0-9]+)?(?:[eE][-+]?[0-9]+)?|0x[0-9a-fA-F]+|0b[01]+)\b/;
+	        this.OPERATOR_REGEX = /^(!=|<>|==|<=|>=|!<|!>|\|\||::|->>|->|=>|.)/;
 
 	        this.BLOCK_COMMENT_REGEX = /^(\/\*[^]*?(?:\*\/|$))/;
 	        this.LINE_COMMENT_REGEX = this.createLineCommentRegex(cfg.lineCommentTypes);
@@ -451,7 +451,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Tokenizer.prototype.createWordRegex = function createWordRegex() {
 	        var specialChars = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
-	        return new RegExp("^([\\w" + specialChars.join("") + "]+)");
+	        return new RegExp("^(\\$?[\\w" + specialChars.join("") + "]+)");
 	    };
 
 	    Tokenizer.prototype.createStringRegex = function createStringRegex(stringTypes) {
@@ -464,15 +464,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // 3. double quoted string using "" or \" to escape
 	    // 4. single quoted string using '' or \' to escape
 	    // 5. national character quoted string using N'' or N\' to escape
+	    // 6. double dollar sign quoted string for multi-line strings, no need to escape anything other than $$
 
 
 	    Tokenizer.prototype.createStringPattern = function createStringPattern(stringTypes) {
+	        // prettier-ignore
 	        var patterns = {
 	            "``": "((`[^`]*($|`))+)",
 	            "[]": "((\\[[^\\]]*($|\\]))(\\][^\\]]*($|\\]))*)",
-	            "\"\"": "((\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*(\"|$))+)",
+	            '""': '(("[^"\\\\]*(?:\\\\.[^"\\\\]*)*("|$))+)',
 	            "''": "(('[^'\\\\]*(?:\\\\.[^'\\\\]*)*('|$))+)",
-	            "N''": "((N'[^N'\\\\]*(?:\\\\.[^N'\\\\]*)*('|$))+)"
+	            "N''": "((N'[^N'\\\\]*(?:\\\\.[^N'\\\\]*)*('|$))+)",
+	            "$$$$": "((\\$\\$(?:\\$[^\\$]+|[^\\$])*(\\$\\$|$))+)"
 	        };
 
 	        return stringTypes.map(function (t) {
@@ -611,7 +614,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            input: input,
 	            regex: this.STRING_NAMED_PLACEHOLDER_REGEX,
 	            parseKey: function parseKey(v) {
-	                return _this2.getEscapedPlaceholderKey({ key: v.slice(2, -1), quoteChar: v.slice(-1) });
+	                return _this2.getEscapedPlaceholderKey({
+	                    key: v.slice(2, -1),
+	                    quoteChar: v.slice(-1)
+	                });
 	            }
 	        });
 	    };
@@ -631,7 +637,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            regex = _ref.regex,
 	            parseKey = _ref.parseKey;
 
-	        var token = this.getTokenOnFirstMatch({ input: input, regex: regex, type: _tokenTypes2["default"].PLACEHOLDER });
+	        var token = this.getTokenOnFirstMatch({
+	            input: input,
+	            regex: regex,
+	            type: _tokenTypes2["default"].PLACEHOLDER
+	        });
 	        if (token) {
 	            token.key = parseKey(token.value);
 	        }
